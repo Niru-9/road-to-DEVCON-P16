@@ -129,7 +129,7 @@ export function buildPaymentLayer(
    * server builds a 402 from the facilitator's advertised `kinds`, so without
    * a successful `initialize()` it cannot even quote a price: an unpaid request
    * comes back 500 ("Facilitator does not support exact on eip155:11155111")
-   * instead of 402. See ARCHITECTURE.md.
+   * instead of 402.
    */
   facilitatorClient?: FacilitatorClient,
 ): PaymentLayer {

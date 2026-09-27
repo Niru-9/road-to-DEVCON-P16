@@ -6,3 +6,7 @@ dist/
 data/
 coverage/
 .DS_Store
+
+# --- internal documents, not part of the public tree ---
+# Internal design rationale. Kept on disk for the author; not part of the public tree.
+/ARCHITECTURE.md
