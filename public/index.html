@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Meera — Railway Delay Notice API</title>
+    <meta
+      name="description"
+      content="Pay-per-call API that turns messy Indian Railways delay notices into validated JSON. Nobody pays for a notice the parser could not read."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23131417'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23e8833a' text-anchor='middle'%3E%E2%82%B9%3C/text%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#notice">Skip to the notice editor</a>
+
+    <header class="masthead">
+      <div class="masthead__id">
+        <span class="mark" aria-hidden="true">₹</span>
+        <div>
+          <h1>Meera</h1>
+          <p class="masthead__sub">Railway Delay Notice API</p>
+        </div>
+      </div>
+
+      <div class="masthead__status">
+        <span class="badge badge--testnet" id="network-badge" title="This build refuses to run on a mainnet network">
+          <span class="badge__dot" aria-hidden="true"></span>
+          <span id="network-label">checking…</span>
+        </span>
+        <span class="badge badge--free" id="pricing-badge">free tier live</span>
+      </div>
+    </header>
+
+    <section class="pitch" aria-labelledby="pitch-heading">
+      <h2 id="pitch-heading" class="pitch__claim">
+        Notices come in broken.<br />Nobody pays for a bad one.
+      </h2>
+      <p class="pitch__body">
+        A station notice is a screenshot, a forwarding, or four lines typed in Marathi at 2am.
+        Meera reads the train, the station and the new time, and returns schema-valid JSON.
+        When she cannot read it, the request fails with a <code>4xx</code> and the verified
+        payment is <strong>released</strong> — the caller keeps their money.
+      </p>
+      <ul class="pitch__prices" id="price-strip" aria-label="Server price list"></ul>
+    </section>
+
+    <main class="console">
+      <!-- ---------------------------------------------------------------- -->
+      <section class="panel panel--input" aria-labelledby="input-heading">
+        <div class="panel__head">
+          <h2 id="input-heading">1 &middot; Paste a notice</h2>
+          <p class="panel__note">Free to check. No payment, no parsed data.</p>
+        </div>
+
+        <div class="samples" role="group" aria-labelledby="samples-label">
+          <span class="samples__label" id="samples-label">Load a sample</span>
+          <div class="samples__row" id="sample-buttons"></div>
+        </div>
+
+        <label class="field">
+          <span class="field__label" id="notice-label">Notice text</span>
+          <textarea
+            id="notice"
+            class="field__input"
+            rows="10"
+            spellcheck="false"
+            aria-describedby="notice-help notice-count"
+            placeholder="TRAIN 12137/12138 DEEPAK EXPRESS&#10;STATION: PUNE JN (PUNE)&#10;EXPECTED DEPARTURE: 19:30 28/08/2026&#10;REASON: Waterlogging near Kharagpur"
+          ></textarea>
+        </label>
+
+        <p class="field__help" id="notice-help">
+          Handles English, Hindi and Marathi, Latin and Devanagari digits, 12- and 24-hour clocks.
+        </p>
+        <p class="field__count" id="notice-count" aria-live="polite">0 / 4000 characters</p>
+
+        <div class="actions">
+          <button type="button" class="btn btn--primary" id="check-btn">
+            Check readability — free
+          </button>
+          <button type="button" class="btn btn--ghost" id="clear-btn">Clear</button>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------------------- -->
+      <section class="panel panel--verdict" aria-labelledby="verdict-heading">
+        <div class="panel__head">
+          <h2 id="verdict-heading">2 &middot; Free verdict</h2>
+          <p class="panel__note">Served by <code>POST /v1/validate</code>. Never charged.</p>
+        </div>
+
+        <div id="verdict" class="verdict verdict--idle">
+          <p class="verdict__headline">Nothing checked yet</p>
+          <p class="verdict__detail">
+            Paste a notice and press <em>Check readability</em>. This route answers one question —
+            can Meera read it? — and returns no parsed fields.
+          </p>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------------------- -->
+      <section class="panel panel--pay" aria-labelledby="pay-heading">
+        <div class="panel__head">
+          <h2 id="pay-heading">3 &middot; The paid handshake</h2>
+          <p class="panel__note">Served by <code>POST /v1/parse</code> behind the x402 middleware.</p>
+        </div>
+
+        <p class="pay__lede">
+          A browser has no x402 wallet, so this page will not pretend to pay. Press the button to
+          see the real <code>402</code> the server returns — the requirements a client would
+          actually read.
+        </p>
+
+        <button type="button" class="btn btn--primary btn--wide" id="paywall-btn">
+          Request <code>/v1/parse</code> without paying
+        </button>
+
+        <div id="handshake" class="handshake" hidden>
+          <div class="handshake__row">
+            <span class="handshake__key">HTTP status</span>
+            <span class="handshake__val" id="hs-status">—</span>
+          </div>
+          <div class="handshake__row">
+            <span class="handshake__key">Price</span>
+            <span class="handshake__val" id="hs-price">—</span>
+          </div>
+          <div class="handshake__row">
+            <span class="handshake__key">Network</span>
+            <span class="handshake__val" id="hs-network">—</span>
+          </div>
+          <div class="handshake__row">
+            <span class="handshake__key">Recipient</span>
+            <span class="handshake__val" id="hs-payto">—</span>
+          </div>
+          <p class="handshake__note" id="hs-note"></p>
+        </div>
+
+        <h3 class="pay__sub">Pay for real</h3>
+        <p class="pay__lede">
+          With a Base&nbsp;Sepolia key in <code>.env</code>, the buyer script signs, pays and prints
+          the settled response.
+        </p>
+        <pre class="code" id="buy-command" tabindex="0"><code>npm run buy -- --sample en-structured-pune</code></pre>
+        <p class="pay__note">
+          Try <code>--sample broken-no-train-number</code> to watch a verified payment get released.
+        </p>
+      </section>
+
+      <!-- ---------------------------------------------------------------- -->
+      <section class="panel panel--ledger" aria-labelledby="ledger-heading">
+        <div class="panel__head">
+          <h2 id="ledger-heading">4 &middot; Server-side trail</h2>
+          <p class="panel__note">Served by <code>GET /v1/audit</code>.</p>
+        </div>
+        <p class="pay__lede">
+          Every settlement and every cancelled payment, as the server saw it. This is the claim,
+          shown from the other side of the wire.
+        </p>
+        <ul class="ledger" id="ledger" aria-live="polite"></ul>
+      </section>
+    </main>
+
+    <footer class="colophon">
+      <p>
+        <strong>x402</strong> &middot; exact scheme on Ethereum&nbsp;Sepolia (<code>eip155:11155111</code>)
+        &middot; prices fixed by the server, in USDC base units
+      </p>
+      <p class="colophon__fine">
+        A 4xx from a paid handler cancels the verified payment. The <code>exact</code> scheme's
+        default <code>authorization</code> flow is what makes that true.
+      </p>
+    </footer>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
